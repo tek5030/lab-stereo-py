@@ -95,7 +95,7 @@ def run_stereo_lab(cam, calibration):
         # Visualise point cloude in 3D.
         viewer_3d.update(pts_3d)
 
-        key = cv2.waitKey(1)
+        key = cv2.waitKey(50)
         if key == ord('q'):
             print("Bye")
             break

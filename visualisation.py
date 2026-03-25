@@ -62,17 +62,10 @@ def add_axis(plotter, pose: SE3, scale=10.0):
 
     T = pose.to_matrix()
 
-    point = pv.Sphere(radius=0.1 * scale)
-    point.transform(T)
-
-    x_arrow = pv.Arrow(direction=(1.0, 0.0, 0.0), scale=scale)
-    x_arrow.transform(T)
-
-    y_arrow = pv.Arrow(direction=(0.0, 1.0, 0.0), scale=scale)
-    y_arrow.transform(T)
-
-    z_arrow = pv.Arrow(direction=(0.0, 0.0, 1.0), scale=scale)
-    z_arrow.transform(T)
+    point = pv.Sphere(radius=0.1 * scale).transform(T, inplace=False)
+    x_arrow = pv.Arrow(direction=(1.0, 0.0, 0.0), scale=scale).transform(T, inplace=False)
+    y_arrow = pv.Arrow(direction=(0.0, 1.0, 0.0), scale=scale).transform(T, inplace=False)
+    z_arrow = pv.Arrow(direction=(0.0, 0.0, 1.0), scale=scale).transform(T, inplace=False)
 
     axis_actors = (
         plotter.add_mesh(point),
@@ -97,12 +90,9 @@ def add_frustum(plotter, camera_model, image_size, scale=0.1):
 
     point_focal = np.zeros([3])
 
-    pyramid = pv.Pyramid([point_bottom_left, point_bottom_right, point_top_left, point_top_right, point_focal])
-    pyramid.transform(S)
-
-    rectangle = pv.Rectangle([point_bottom_left, point_bottom_right, point_top_left])
-    rectangle.texture_map_to_plane(inplace=True)
-    rectangle.transform(S)
+    pyramid = pv.Pyramid(
+        [point_bottom_left, point_bottom_right, point_top_left, point_top_right, point_focal]
+    ).transform(S, inplace=False)
 
     frustum_actor = plotter.add_mesh(pyramid, show_edges=True, style='wireframe', render=False)
 
@@ -156,7 +146,7 @@ def visualise_depths(stereo_pair, pts_left, depths):
 
 
 def visualise_dense(dense_depth: np.ndarray, min_depth, max_depth, duration_dense):
-    vis_dense_depth = dense_depth / max_depth
+    vis_dense_depth = (dense_depth / max_depth).astype(np.float32)
     vis_dense_depth = cv2.cvtColor(vis_dense_depth * 255, cv2.COLOR_GRAY2BGR).astype(np.uint8)
     vis_dense_depth = cv2.applyColorMap(vis_dense_depth, cv2.COLORMAP_JET)
 
